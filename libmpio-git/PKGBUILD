@@ -1,0 +1,43 @@
+# Contributor: Brandur Leach <brandur@brandur.org>
+
+pkgname=libmpio-git
+pkgver=20110719
+pkgrel=1
+pkgdesc="Multipurpose concurrent I/O framework for C++"
+arch=('i686' 'x86_64')
+url="http://github.com/frsyuki/mpio/"
+license=('apache')
+depends=()
+makedepends=('gcc' 'git' 'make' 'ruby')
+provides=('libmpio')
+conflicts=('libmpio')
+
+_gitroot="https://github.com/brandur/mpio.git"
+_gitname="mpio"
+
+build() {
+  cd ${srcdir}
+  msg "Connecting to github.com GIT server...."
+  
+  if [ -d $_gitname ] ; then
+    cd $_gitname && git pull origin
+    msg "The local files are updated."
+  else
+    git clone $_gitroot --depth=1
+  fi
+  
+  msg "GIT checkout done or server timeout"
+  
+  msg "Creating build directory"
+  if [ -d "${srcdir}/$_gitname-build" ]; then rm -rf "${srcdir}/$_gitname-build"; fi
+  cp -R "${srcdir}/$_gitname" "${srcdir}/$_gitname-build"
+  
+  cd ${srcdir}/$_gitname-build
+
+  msg "Starting make..."
+
+  ./bootstrap
+  ./configure --prefix=/usr
+  make || return 1
+  make DESTDIR=${pkgdir} install || return 1
+}
