@@ -1,0 +1,43 @@
+#Contributor: Brandur Leach <brandur@brandur.org>
+
+pkgname=libmsgpack-rpc-git
+pkgver=20110719
+pkgrel=1
+pkgdesc="MessagePack-RPC is an inter-process messaging library that uses MessagePack for object serialization"
+arch=('i686' 'x86_64')
+url="http://github.com/msgpack/msgpack-rpc/"
+license=('apache')
+depends=()
+makedepends=('gcc' 'git' 'make' 'libmpio' 'msgpack-git' 'ruby')
+provides=('libmsgpack-rpc')
+conflicts=('libmsgpack-rpc')
+
+_gitroot="https://github.com/msgpack/msgpack-rpc.git"
+_gitname="msgpack-rpc"
+
+build() {
+  cd ${srcdir}
+  msg "Connecting to github.com GIT server...."
+  
+  if [ -d $_gitname ] ; then
+    cd $_gitname && git pull origin
+    msg "The local files are updated."
+  else
+    git clone $_gitroot --depth=1
+  fi
+  
+  msg "GIT checkout done or server timeout"
+  
+  msg "Creating build directory"
+  if [ -d "${srcdir}/$_gitname-build" ]; then rm -rf "${srcdir}/$_gitname-build"; fi
+  cp -R "${srcdir}/$_gitname" "${srcdir}/$_gitname-build"
+  
+  cd ${srcdir}/$_gitname-build/cpp
+
+  msg "Starting make..."
+
+  ./bootstrap
+  ./configure --prefix=/usr
+  make || return 1
+  make DESTDIR=${pkgdir} install || return 1
+}
