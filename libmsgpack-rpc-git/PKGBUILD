@@ -1,4 +1,5 @@
-#Contributor: Brandur Leach <brandur@brandur.org>
+# Contributor: Brandur Leach <brandur@brandur.org>
+# Source available at: https://github.com/brandur/archlinux-packages
 
 pkgname=libmsgpack-rpc-git
 pkgver=20110719
